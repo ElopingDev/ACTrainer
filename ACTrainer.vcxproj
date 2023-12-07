@@ -27,6 +27,7 @@
     <ClCompile Include="ext\imgui\imgui_tables.cpp" />
     <ClCompile Include="ext\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\functions.cpp" />
     <ClCompile Include="src\gui.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -40,7 +41,6 @@
     <ClInclude Include="ext\imgui\imstb_truetype.h" />
     <ClInclude Include="src\functions.h" />
     <ClInclude Include="src\gui.h" />
-    <ClInclude Include="src\offsets.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

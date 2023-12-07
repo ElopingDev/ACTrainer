@@ -1,5 +1,7 @@
 #pragma once
 #include <d3d9.h>
+#include <vector>
+#include "functions.h"
 
 
 namespace gui
@@ -41,5 +43,19 @@ namespace hacks
 {
 	inline bool ammo = false;
 	inline bool flyHack = false;
+	inline bool wRecoil = false;
 
 }
+
+class Offsets
+{
+public:
+	std::vector<DWORD> ammoOffsets = { 0x364, 0x14, 0x0 };
+	std::vector<DWORD> yPosOffsets = { 0x30 };
+	std::vector<DWORD> wRecoilOffsets = { 0x365, 0xC, 0x60 };
+	DWORD baseAddress = 0x017E0A8;
+	DWORD baseModule = (DWORD)GetModuleHandle("ac_client.exe");
+	DWORD recoilAddress = 0x004C2EC3 - baseModule;
+
+
+};

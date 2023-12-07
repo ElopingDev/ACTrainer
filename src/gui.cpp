@@ -310,6 +310,12 @@ void gui::Render() noexcept
 
 			ImGui::EndTabItem();
 		}
+
+		ImGui::Checkbox("Recoil", &hacks::wRecoil);
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Removes weapon's recoil.");
+
+		ImGui::EndTabItem();
 	}
 
 	ImGui::End();

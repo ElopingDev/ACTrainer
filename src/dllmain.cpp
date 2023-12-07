@@ -7,48 +7,64 @@
 #include <memoryapi.h>
 #include <vector>
 #include "functions.h"
-#include "offsets.h"
 #include "gui.h"
 
 
 // Add this macro to enable more detailed logging during debugging
-int value;
-DWORD baseAddress = 0x017E0A8;
+   
 
 
-DWORD WINAPI MainThread(HMODULE hModule) {
-
-   DWORD baseModule = (DWORD)GetModuleHandle("ac_client.exe");
-   Offsets offsets;
+   DWORD WINAPI MainThread(HMODULE hModule) {
+    Offsets offsets;
+    int value;
+    BYTE recoilNop[] = { 0x90, 0x90, 0x90, 0x90 };  // NOP instruction
+    bool recoilSet = false;
 
     AllocConsole();
     FILE* f;
     freopen_s(&f, "CONOUT$", "w", stdout);
-    std::cout << "Injected";
+    std::cout << "Injected" << std::endl;
     gui::CreateHWindow("ACTrainer", "ACTrainer Class");
     gui::CreateDevice();
     gui::CreateImGui();
-    std::cout << "ImGui Done";
-  
-    HANDLE hProcess = GetCurrentProcess();
+    std::cout << "ImGui Done" << std::endl;
 
+
+    HANDLE hProcess = GetCurrentProcess();
     while (!GetAsyncKeyState(VK_END))
     {
         gui::BeginRender();
         gui::Render();
         gui::EndRender();
-
-       Sleep(100);
-        std::cout << hacks::ammo;
+        
+        Sleep(100);
         if (hacks::ammo == true)
+
         {
-            int* ammo = (int*)GetPointerAddress(baseModule + 0x17E0A8, offsets.ammoOffsets);
+            int* ammo = (int*)GetPointerAddress(offsets.baseModule + 0x17E0A8, offsets.ammoOffsets);
             *ammo = 999;
         }
 
+        if (hacks::wRecoil == true && recoilSet == false)
+        {
+            std::cout << "Attempting to read" << std::endl;
+            ReadProcessMemory(GetCurrentProcess(), (LPVOID)(offsets.baseModule + offsets.recoilAddress), originalInstructions, sizeof(originalInstructions), NULL);
+            std::cout << "READ" << std::endl;
+            std::cout << "Attempting to WRITE" << std::endl;
+            WriteProcessMemory(GetCurrentProcess(), (LPVOID)(offsets.baseModule + offsets.recoilAddress), recoilNop, sizeof(recoilNop), NULL);
+            std::cout << "WROTE" << std::endl;
+            recoilSet = true;
+        }
+        
+        if (hacks::wRecoil == false && recoilSet == true)
+        {
+            RestoreOriginalInstructions(offsets.baseModule + offsets.recoilAddress, originalInstructions, sizeof(originalInstructions));
+            recoilSet = false;
+        }
+       
     }
     
-    MessageBoxA(NULL, "Successfully uninjected.", "ACTrainer", NULL);
+   // MessageBoxA(NULL, "Successfully uninjected.", "ACTrainer", NULL);
     fclose(f);
     FreeConsole();
     gui::DestroyImGui();
@@ -65,7 +81,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     {
         DisableThreadLibraryCalls(hModule);
         CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)MainThread, hModule, 0, NULL);
-        MessageBoxA(NULL, "ACTrainer Injected", "Injection", NULL);
+       // MessageBoxA(NULL, "ACTrainer Injected", "Injection", NULL);
     }
     return TRUE;
 }
